@@ -2,6 +2,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const authRouter = require("./routes/auth");
+const bannreRouter = require("./routes/banner");
 
 // Defined the port number the server will listen on
 const PORT = 3000;
@@ -13,7 +14,8 @@ const app = express();
 const DB = "mongodb+srv://letiendungdt:1234@cluster0.2lqxv1q.mongodb.net/"
 //middleware - to register routes or to mount routes
 app.use(express.json());
-app.use(authRouter)
+app.use(authRouter);
+app.use(bannreRouter);
 
 mongoose.connect(DB).then(() => {
 console.log('mongodb connected');

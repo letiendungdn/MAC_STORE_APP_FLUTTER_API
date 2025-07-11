@@ -7,6 +7,7 @@ const categoryRouter = require("./routes/category");
 const subCategoryRouter = require("./routes/sub_category");
 const productRouter = require("./routes/product");
 const productReviewRouter = require("./routes/product_review");
+const cors = require("cors");
 
 // Defined the port number the server will listen on
 const PORT = 3000;
@@ -18,6 +19,7 @@ const app = express();
 const DB = "mongodb+srv://letiendungdt:1234@cluster0.2lqxv1q.mongodb.net/"
 //middleware - to register routes or to mount routes
 app.use(express.json());
+app.use(cors()); // Enable CORS for all routes
 app.use(authRouter);
 app.use(bannreRouter);
 app.use(categoryRouter);

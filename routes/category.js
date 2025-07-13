@@ -15,9 +15,8 @@ categoryRouter.post('/api/categories', async (req, res) => {
 
 categoryRouter.get('/api/categories', async (req, res) => {
     try {
-        const category = new Category();
-        await category.find();
-        return res.status(200).send({category});
+        const category = await Category.find();
+        return res.status(200).send(category);
     } catch (e) {
         res.status(500).json({error: e.message})
     }

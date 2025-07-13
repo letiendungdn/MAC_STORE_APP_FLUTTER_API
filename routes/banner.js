@@ -16,7 +16,7 @@ bannreRouter.post('/api/banner', async (req, res) => {
 bannreRouter.get('/api/banner', async (req, res) => {
     try {
        
-        const banners = await banner.find();
+        const banners = await Banner.find();
         return res.status(200).send(banners);
     } catch (e) {
         res.status(500).json({error: e.message})

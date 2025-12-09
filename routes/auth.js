@@ -46,7 +46,7 @@ authRouter.post('/api/signin', async (req, res) => {
             console.log("🚀 ~ authRouter.post ~ password:", password)
 
             // send the respones
-            res.json({token, ... userWithoutPassword})
+            res.json({token,user: userWithoutPassword})
         }
        }
       

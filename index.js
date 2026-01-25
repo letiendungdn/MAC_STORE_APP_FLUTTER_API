@@ -7,6 +7,7 @@ const categoryRouter = require("./routes/category");
 const subCategoryRouter = require("./routes/sub_category");
 const productRouter = require("./routes/product");
 const productReviewRouter = require("./routes/product_review");
+const orderRouter = require("./routes/order");
 const vendorRouter = require("./routes/vendor");
 const cors = require("cors");
 
@@ -27,6 +28,7 @@ app.use(categoryRouter);
 app.use(subCategoryRouter);
 app.use(productRouter);
 app.use(productReviewRouter);
+app.use(orderRouter);
 app.use(vendorRouter);
 //connect to mongodb
 

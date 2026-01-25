@@ -18,6 +18,8 @@ orderRouter.post("/api/orders", async (req, res) => {
             image,
             buyerId,
             vendorId,
+            processing,
+            delivered,
         } = req.body;
          const createdAt = new Date().getMilliseconds();
 
@@ -34,6 +36,8 @@ orderRouter.post("/api/orders", async (req, res) => {
             buyerId,
             vendorId,
             createdAt,
+            processing,
+            delivered,
         });
 
        

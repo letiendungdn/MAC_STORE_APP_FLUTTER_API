@@ -70,4 +70,25 @@ orderRouter.get("/api/orders/:buyerId", async (req, res) => {
     }
 });
 
+//Delete route for deleting a specific order by _id
+orderRouter.delete("/api/orders/:id", async (req, res) => {
+    try {
+        //extract the id from the request parameter
+        const { id } = req.params;
+        //find and delete the order from the database using the extracted _id
+        const deletedOrder = await Order.findByIdAndDelete(id);
+        //check if an order was found and deleted
+        if (!deletedOrder) {
+            //if no order was found with the provided _id return 404
+            return res.status(404).json({ msg: "Order not found" });
+        } else {
+            //if the order was successfully deleted , return 200 status  with a success message
+            return res.status(200).json({ msg: "Order was deleted successfully" });
+        }
+    } catch (e) {
+        //if an error occures during the process, return a 500 status with the error message
+        res.status(500).json({ error: e.message });
+    }
+});
+
 module.exports = orderRouter;

@@ -49,7 +49,7 @@ orderRouter.post("/api/orders", async (req, res) => {
 });
 
 // GET route for fetching orders by buyer ID
-orderRouter.get("/api/orders/:buyerId", async (req, res) => {
+orderRouter.get("/api/orders/buyer/:buyerId", async (req, res) => {
     try {
         // Extract the buyerId from the request parameters
         const { buyerId } = req.params;
@@ -60,6 +60,28 @@ orderRouter.get("/api/orders/:buyerId", async (req, res) => {
         // If no orders are found, return a 404 status with a message
         if (orders.length === 0) {
             return res.status(404).json({ msg: "No Orders found for this buyer" });
+        }
+
+        // If orders are found, return them with a 200 status code
+        return res.status(200).json(orders);
+    } catch (e) {
+        // Handle any errors that occur during the order retrieval process
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// GET route for fetching orders by vendor ID
+orderRouter.get("/api/orders/:vendorId", async (req, res) => {
+    try {
+        // Extract the vendorId from the request parameters
+        const { vendorId } = req.params;
+
+        // Find all orders in the database that match the vendorId
+        const orders = await Order.find({ vendorId });
+
+        // If no orders are found, return a 404 status with a message
+        if (orders.length === 0) {
+            return res.status(404).json({ msg: "No Orders found for this vendor" });
         }
 
         // If orders are found, return them with a 200 status code

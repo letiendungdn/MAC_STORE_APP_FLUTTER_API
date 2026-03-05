@@ -21,7 +21,7 @@ orderRouter.post("/api/orders", async (req, res) => {
             processing,
             delivered,
         } = req.body;
-         const createdAt = new Date().getMilliseconds();
+        const createdAt = new Date().getMilliseconds();
 
         const order = new Order({
             fullName,
@@ -40,7 +40,7 @@ orderRouter.post("/api/orders", async (req, res) => {
             delivered,
         });
 
-       
+
         await order.save();
         return res.status(201).send(order);
     } catch (e) {
@@ -120,7 +120,7 @@ orderRouter.patch("/api/orders/:id/delivered", async (req, res) => {
 
         const updatedOrder = await Order.findByIdAndUpdate(
             id,
-            { delivered: true },
+            { delivered: true, processing: false },
             { new: true }
         );
 
@@ -141,7 +141,7 @@ orderRouter.patch("/api/orders/:id/processing", async (req, res) => {
 
         const updatedOrder = await Order.findByIdAndUpdate(
             id,
-            { processing: false },
+            { processing: false, delivered: false },
             { new: true }
         );
 

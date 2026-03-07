@@ -44,7 +44,15 @@ const productSchema = mongoose.Schema({
     },
     recommend: {
         type: Boolean,
-        default: true,
+        default: false,
+    },
+    averageRating: {
+        type: Number,
+        default: 0,
+    },
+    totalRatings: {
+        type: Number,
+        default: 0,
     },
 })
 

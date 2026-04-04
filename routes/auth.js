@@ -64,19 +64,29 @@ authRouter.put('/api/users/:id', async (req, res) => {
         const {state, city, locality} = req.body;
         //Find the user by their ID and update the state, city and locality fields
         // the {new:true} option ensures the updated document is returned
-        const udatedUser = await User.findByIdAndUpdate(
+        const updatedUser = await User.findByIdAndUpdate(
             id,
             {state, city, locality},
             {new:true},
         );
 
         // if no user is found, return 4040 page not found status with an error message
-        if(!udatedUser) {
+        if(!updatedUser) {
             return res.status(404).json({error: "User not found"});
         }
-        return res.status(200).json(udatedUser);
-    } catch (error) {
+        return res.status(200).json(updatedUser);
+    } catch (e) {
         res.status(500).json({error:e.message});
+    }
+});
+
+//Fetch all users(exclude password)
+authRouter.get('/api/users', async (req, res) => {
+    try {
+        const users = await User.find().select('-password');
+        return res.status(200).json(users);
+    } catch (e) {
+        res.status(500).json({error: e.message});
     }
 });
 

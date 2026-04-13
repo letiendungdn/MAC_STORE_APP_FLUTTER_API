@@ -70,6 +70,16 @@ orderRouter.get("/api/orders/buyer/:buyerId", async (req, res) => {
     }
 });
 
+// GET route for fetching all orders
+orderRouter.get("/api/orders", async (req, res) => {
+    try {
+        const orders = await Order.find();
+        return res.status(200).json(orders);
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
+    }
+});
+
 // GET route for fetching orders by vendor ID
 orderRouter.get("/api/orders/:vendorId", async (req, res) => {
     try {
@@ -154,5 +164,7 @@ orderRouter.patch("/api/orders/:id/processing", async (req, res) => {
         return res.status(500).json({ error: e.message });
     }
 });
+
+
 
 module.exports = orderRouter;

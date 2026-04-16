@@ -1,10 +1,11 @@
 const express = require("express");
 const Order = require("../models/order");
+const { auth, vendorAuth } = require("../middleware/auth");
 
 const orderRouter = express.Router();
 
 // Create a new order
-orderRouter.post("/api/orders", async (req, res) => {
+orderRouter.post("/api/orders", auth, async (req, res) => {
     try {
         const {
             fullName,

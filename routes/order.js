@@ -1,10 +1,11 @@
 const express = require("express");
 const Order = require("../models/order");
+const { auth, vendorAuth } = require("../middleware/auth");
 
 const orderRouter = express.Router();
 
 // Create a new order
-orderRouter.post("/api/orders", async (req, res) => {
+orderRouter.post("/api/orders", auth, async (req, res) => {
     try {
         const {
             fullName,
@@ -67,6 +68,16 @@ orderRouter.get("/api/orders/buyer/:buyerId", async (req, res) => {
     } catch (e) {
         // Handle any errors that occur during the order retrieval process
         res.status(500).json({ error: e.message });
+    }
+});
+
+// GET route for fetching all orders
+orderRouter.get("/api/orders", async (req, res) => {
+    try {
+        const orders = await Order.find();
+        return res.status(200).json(orders);
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
     }
 });
 
@@ -154,5 +165,7 @@ orderRouter.patch("/api/orders/:id/processing", async (req, res) => {
         return res.status(500).json({ error: e.message });
     }
 });
+
+
 
 module.exports = orderRouter;

@@ -43,6 +43,47 @@ productRouter.get('/api/products-by-category/:category', auth, vendorAuth, async
     }
 });
 
+// new route for retrieving related products by subcategory
+productRouter.get('/api/related-products-by-subcatagory/:productId', async (req, res) => {
+    try {
+        const { productId } = req.params;
+        // first, find the product to get its subcategory
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ msg: "Product not found" });
+        }
+
+        // find related products based on the subcategory and exclude current product
+        const relatedProducts = await Product.find({
+            subCategory: product.subCategory,
+            _id: { $ne: productId },
+        });
+
+        if (!relatedProducts || relatedProducts.length == 0) {
+            return res.status(404).json({ msg: "No related products found" });
+        }
+
+        return res.status(200).json(relatedProducts);
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+// route for retrieving the top 10 highest-rated products
+productRouter.get('/api/top-rated-products', async (req, res) => {
+    try {
+        // fetch all products sorted by average rating in descending order and limit to 10
+        const topRatedProducts = await Product.find({}).sort({ averageRating: -1 }).limit(10);
+        if (!topRatedProducts || topRatedProducts.length == 0) {
+            return res.status(404).json({ msg: "No top-rated products found" });
+        }
+
+        return res.status(200).json(topRatedProducts);
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
+    }
+});
+
 
 
 

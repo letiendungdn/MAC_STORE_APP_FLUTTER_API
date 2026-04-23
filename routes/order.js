@@ -104,7 +104,7 @@ orderRouter.get("/api/orders/:vendorId", async (req, res) => {
 });
 
 //Delete route for deleting a specific order by _id
-orderRouter.delete("/api/orders/:id", async (req, res) => {
+orderRouter.delete("/api/orders/:id", auth, async (req, res) => {
     try {
         //extract the id from the request parameter
         const { id } = req.params;

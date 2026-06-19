@@ -11,8 +11,8 @@ const orderRouter = require("./routes/order");
 const vendorRouter = require("./routes/vendor");
 const cors = require("cors");
 
-// Defined the port number the server will listen on
-const PORT = 3000;
+//Defind the port number the server will listen on
+const PORT = process.env.PORT || 3000;
 
 // create an instance of an express application
 // because it give us the starting point

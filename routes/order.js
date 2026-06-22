@@ -1,49 +1,130 @@
 const express = require("express");
 const Order = require("../models/order");
+const stripe = require("stripe")("sk_test_51QLDePAmIU5CvhmkLukzvm0oGBRWfYPMzxVt0sAV2mpNYGPWwqcm3BkbPJ");
 const { auth, vendorAuth } = require("../middleware/auth");
 
 const orderRouter = express.Router();
 
-// Create a new order
+///Post route for creating orders
 orderRouter.post("/api/orders", auth, async (req, res) => {
     try {
         const {
             fullName,
             email,
             state,
+            city,
             locality,
             productName,
             productPrice,
             quantity,
             category,
             image,
-            buyerId,
             vendorId,
-            processing,
-            delivered,
+            buyerId,
         } = req.body;
+
         const createdAt = new Date().getMilliseconds();
 
         const order = new Order({
             fullName,
             email,
             state,
+            city,
             locality,
             productName,
             productPrice,
             quantity,
             category,
             image,
-            buyerId,
             vendorId,
+            buyerId,
             createdAt,
-            processing,
-            delivered,
         });
 
-
         await order.save();
-        return res.status(201).send(order);
+
+        const customer = await stripe.customers.create({
+            name: fullName,
+            email: email,
+        });
+
+        const ephemeralKey = await stripe.ephemeralKeys.create(
+            { customer: customer.id },
+            { apiVersion: "2023-10-16" }
+        );
+
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: productPrice * quantity * 100,
+            currency: "usd",
+            customer: customer.id,
+        });
+
+        return res.status(201).send({
+            paymentIntent: paymentIntent.client_secret,
+            ephemeralKey: ephemeralKey.secret,
+            customer: customer.id,
+        });
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
+    }
+});
+
+//payment api
+orderRouter.post("/api/payment", async (req, res) => {
+    try {
+        const { orderId, paymentMethodId, currency = "usd" } = req.body;
+
+        if (!orderId || !paymentMethodId || !currency) {
+            return res.status(400).json({ msg: "Missing required fields" });
+        }
+
+        const order = await Order.findById(orderId);
+        if (!order) {
+            console.log("order not found", orderId);
+            return res.status(404).json({ msg: "Order not found" });
+        }
+
+        //calculate the total amount(price * quantity)
+        const totalAmount = order.productPrice * order.quantity;
+
+        //Ensure the amount is at least $0.50 USD or its equivalent
+        const minimumAmount = 0.50;
+        if (totalAmount < minimumAmount) {
+            return res.status(400).json({ error: "Amount must be at least $0.50 USD" });
+        }
+
+        //convert total amount to cents(Stripe requires the amount in cents)
+        const amountInCents = Math.round(totalAmount * 100);
+
+        //Now create the Payment intent with the correct amount
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount: amountInCents,
+            currency: currency,
+            payment_method: paymentMethodId,
+            automatic_payment_methods: { enabled: true },
+        });
+
+        return res.json({
+            status: "success",
+            paymentIntentId: paymentIntent.id,
+            amount: paymentIntent.amount / 100,
+            currency: paymentIntent.currency,
+        });
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
+    }
+});
+
+orderRouter.post("/api/payment-intent", async (req, res) => {
+    try {
+        const { amount, currency } = req.body;
+
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount,
+            currency,
+        });
+
+        return res.status(200).json(paymentIntent);
     } catch (e) {
         return res.status(500).json({ error: e.message });
     }

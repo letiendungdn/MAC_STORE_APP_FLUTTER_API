@@ -21,6 +21,11 @@ orderRouter.post("/api/orders", auth, async (req, res) => {
             image,
             vendorId,
             buyerId,
+            processing,
+            delivered,
+            paymentStatus,
+            paymentIntentId,
+            paymentMethod,
         } = req.body;
 
         const createdAt = new Date().getMilliseconds();
@@ -38,32 +43,16 @@ orderRouter.post("/api/orders", auth, async (req, res) => {
             image,
             vendorId,
             buyerId,
+            processing,
+            delivered,
             createdAt,
+            paymentStatus,
+            paymentIntentId,
+            paymentMethod,
         });
 
         await order.save();
-
-        const customer = await stripe.customers.create({
-            name: fullName,
-            email: email,
-        });
-
-        const ephemeralKey = await stripe.ephemeralKeys.create(
-            { customer: customer.id },
-            { apiVersion: "2023-10-16" }
-        );
-
-        const paymentIntent = await stripe.paymentIntents.create({
-            amount: productPrice * quantity * 100,
-            currency: "usd",
-            customer: customer.id,
-        });
-
-        return res.status(201).send({
-            paymentIntent: paymentIntent.client_secret,
-            ephemeralKey: ephemeralKey.secret,
-            customer: customer.id,
-        });
+        return res.status(201).send(order);
     } catch (e) {
         return res.status(500).json({ error: e.message });
     }
@@ -115,7 +104,7 @@ orderRouter.post("/api/payment", async (req, res) => {
     }
 });
 
-orderRouter.post("/api/payment-intent", async (req, res) => {
+orderRouter.post("/api/payment-intent", auth, async (req, res) => {
     try {
         const { amount, currency } = req.body;
 
@@ -124,6 +113,15 @@ orderRouter.post("/api/payment-intent", async (req, res) => {
             currency,
         });
 
+        return res.status(200).json(paymentIntent);
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
+    }
+});
+
+orderRouter.get("/api/payment-intent/:id", async (req, res) => {
+    try {
+        const paymentIntent = await stripe.paymentIntents.retrieve(req.params.id);
         return res.status(200).json(paymentIntent);
     } catch (e) {
         return res.status(500).json({ error: e.message });

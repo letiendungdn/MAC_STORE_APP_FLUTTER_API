@@ -7,9 +7,10 @@ const categoryRouter = require("./routes/category");
 const subCategoryRouter = require("./routes/sub_category");
 const productRouter = require("./routes/product");
 const productReviewRouter = require("./routes/product_review");
-const orderRouter = require("./routes/order");
 const vendorRouter = require("./routes/vendor");
+const orderRouter = require("./routes/order");
 const cors = require("cors");
+require("dotenv").config();
 
 //Defind the port number the server will listen on
 const PORT = process.env.PORT || 3000;
@@ -17,24 +18,21 @@ const PORT = process.env.PORT || 3000;
 // create an instance of an express application
 // because it give us the starting point
 const app = express();
-//mongodb string
-const DB = "mongodb+srv://letiendungdt:1234@cluster0.2lqxv1q.mongodb.net/"
 //middleware - to register routes or to mount routes
 app.use(express.json());
-app.use(cors()); // Enable CORS for all routes
+app.use(cors()); ///enable cors for all routes and origin
 app.use(authRouter);
 app.use(bannreRouter);
 app.use(categoryRouter);
 app.use(subCategoryRouter);
 app.use(productRouter);
 app.use(productReviewRouter);
-app.use(orderRouter);
 app.use(vendorRouter);
-//connect to mongodb
+app.use(orderRouter);
 
-mongoose.connect(DB).then(() => {
-console.log('mongodb connected');
-})
+mongoose.connect(process.env.DATABASE).then(() => {
+    console.log("mongodb connected");
+});
 
 //start the server and listen on the specified port
 app.listen(PORT,"0.0.0.0",function(){
